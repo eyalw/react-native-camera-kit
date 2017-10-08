@@ -61,6 +61,15 @@ RCT_EXPORT_MODULE();
     return _topLevelUserCollections;
 }
 
+-(PHFetchResult *)smartCollections {
+    if (!_smartAlbums) {
+        _smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                                                                              subtype:PHAssetCollectionSubtypeAlbumRegular
+                                                                              options:nil];
+    }
+    return _smartAlbums;
+}
+
 
 #pragma mark -
 
@@ -160,39 +169,44 @@ RCT_EXPORT_METHOD(getAlbumsWithThumbnails:(RCTPromiseResolveBlock)resolve
     
     __block NSMutableArray *albumsArray = [[NSMutableArray alloc] init];
     
-    [self extractCollectionsDetails:self.topLevelUserCollections
-                imageRequestOptions:imageRequestOptions
-                      thumbnailSize:retinaSquare
-                              block:^(NSDictionary *albums) {
-                                  
-                                  [self extractCollection:self.allPhotos imageRequestOptions:imageRequestOptions thumbnailSize:retinaSquare block:^(NSDictionary *allPhotosAlbum) {
-                                      
-                                      
-                                      if (resolve) {
-                                          NSMutableArray *albumsArrayAns = [[NSMutableArray alloc] init];;
-                                          
-                                          if(albums[@"albums"]) {
-                                              [albumsArrayAns addObjectsFromArray:albums[@"albums"]];
-                                          }
-                                          if(allPhotosAlbum) {
-                                              [albumsArrayAns insertObject:allPhotosAlbum atIndex:0];
-                                          }
-                                          
-                                          if (!albumsArrayAns || albumsArrayAns.count == 0) {
-                                              NSError *error = [[NSError alloc] initWithDomain:NSCocoaErrorDomain
-                                                                                          code:-100 userInfo:nil];
-                                              
-                                              reject(@"-100", @"no albums", error);
-                                          }
-                                          else {
-                                              if (resolve) {
-                                                  NSDictionary *ans = @{@"albums":  albumsArrayAns };
-                                                  resolve(ans);
-                                              }
-                                          }
-                                      }
-                                  }];
-                              }];
+    [self extractCollectionsDetails:self.topLevelUserCollections imageRequestOptions:imageRequestOptions
+                      thumbnailSize:retinaSquare block:^(NSDictionary *userAlbums) {
+          
+          [self extractCollectionsDetails:self.smartCollections imageRequestOptions:imageRequestOptions
+                            thumbnailSize:retinaSquare block:^(NSDictionary *smartAlbums) {
+                          
+          [self extractCollection:self.allPhotos imageRequestOptions:imageRequestOptions thumbnailSize:retinaSquare block:^(NSDictionary *allPhotosAlbum) {
+              
+              
+              if (resolve) {
+                  NSMutableArray *albumsArrayAns = [[NSMutableArray alloc] init];;
+                  
+                  if(userAlbums[@"albums"]) {
+                      [albumsArrayAns addObjectsFromArray:userAlbums[@"albums"]];
+                  }
+                  if(smartAlbums[@"albums"]) {
+                      [albumsArrayAns addObjectsFromArray:smartAlbums[@"albums"]];
+                  }
+                  if(allPhotosAlbum) {
+                      [albumsArrayAns insertObject:allPhotosAlbum atIndex:0];
+                  }
+                  
+                  if (!albumsArrayAns || albumsArrayAns.count == 0) {
+                      NSError *error = [[NSError alloc] initWithDomain:NSCocoaErrorDomain
+                                                                  code:-100 userInfo:nil];
+                      
+                      reject(@"-100", @"no albums", error);
+                  }
+                  else {
+                      if (resolve) {
+                          NSDictionary *ans = @{@"albums":  albumsArrayAns };
+                          resolve(ans);
+                      }
+                  }
+              }
+          }];
+      }];
+    }];
 }
 
 RCT_EXPORT_METHOD(getImagesForIds:(NSArray*)imagesIdArray

@@ -21,7 +21,7 @@
 
 
 
-#define BADGE_MARGIN            5
+#define BADGE_MARGIN            10
 #define BADGE_COLOR             0x00ADF5
 #define IMAGE_OVERLAY_ALPHA     0.5
 
@@ -162,11 +162,11 @@ static NSString *remoteDownloadIndicatorType = REMOTE_DOWNLOAD_INDICATOR_TYPE_SP
     
     CGRect imageViewFrame = self.bounds;
     
-    if(imageStrokeColor) {
-        imageViewFrame.size.height -= 2;
-        imageViewFrame.size.width -= 2;
-        self.backgroundColor = imageStrokeColor;
-    }
+//    if(imageStrokeColor) {
+//        imageViewFrame.size.height -= 2;
+//        imageViewFrame.size.width -= 2;
+//        self.backgroundColor = imageStrokeColor;
+//    }
     
     self.imageView = [[UIImageView alloc] initWithFrame:imageViewFrame];
     self.imageView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
@@ -188,10 +188,10 @@ static NSString *remoteDownloadIndicatorType = REMOTE_DOWNLOAD_INDICATOR_TYPE_SP
     self.isSupported = YES;
     
     
-    self.gesture = [[SelectionGesture alloc] initWithTarget:self action:@selector(handleGesture:)];
-    [self addGestureRecognizer:self.gesture];
-    self.gesture.cancelsTouchesInView = NO;
-    self.gesture.delegate = self;
+//    self.gesture = [[SelectionGesture alloc] initWithTarget:self action:@selector(handleGesture:)];
+//    [self addGestureRecognizer:self.gesture];
+//    self.gesture.cancelsTouchesInView = NO;
+//    self.gesture.delegate = self;
     
     [self applyStyleOnInit];
     
@@ -305,12 +305,13 @@ static NSString *remoteDownloadIndicatorType = REMOTE_DOWNLOAD_INDICATOR_TYPE_SP
             UIImage *unsupportedImage = supported[UNSUPPORTED_IMAGE];
             if (unsupportedImage) {
                 CGRect imageViewFrame = self.unsupportedView.bounds;
-                imageViewFrame.size.height  = self.unsupportedView.bounds.size.height/4*2;
-                imageViewFrame.origin.y = self.unsupportedView.bounds.size.height/4 - (imageViewFrame.size.height/6);
+                imageViewFrame.origin.y = self.unsupportedView.bounds.size.height - unsupportedImage.size.height - BADGE_MARGIN;
+                imageViewFrame.origin.x = self.unsupportedView.bounds.size.width - unsupportedImage.size.width - BADGE_MARGIN;
+                imageViewFrame.size = unsupportedImage.size;
                 
                 imageView = [[UIImageView alloc] initWithImage:unsupportedImage];
                 imageView.frame = imageViewFrame;
-                imageView.contentMode = UIViewContentModeScaleAspectFit;
+//                imageView.contentMode = UIViewContentModeBottomRight;
                 [self.unsupportedView addSubview:imageView];
             }
             
@@ -367,6 +368,9 @@ static NSString *remoteDownloadIndicatorType = REMOTE_DOWNLOAD_INDICATOR_TYPE_SP
 
 -(void)setIsSelected:(BOOL)isSelected {
     
+    if (_isSelected == isSelected)
+        return;
+    
     _isSelected = isSelected;
     
     if (self.disableSelectionIcons) return;
@@ -391,6 +395,11 @@ static NSString *remoteDownloadIndicatorType = REMOTE_DOWNLOAD_INDICATOR_TYPE_SP
         else {
             self.badgeImageView.backgroundColor = UIColorFromRGB(BADGE_COLOR);
         }
+        
+        if (imageStrokeColor) {
+            self.imageView.layer.borderWidth = 4.0f;
+            self.imageView.layer.borderColor = imageStrokeColor.CGColor;
+        }
     }
     else {
         if (unSelectedImageIcon) {
@@ -399,6 +408,11 @@ static NSString *remoteDownloadIndicatorType = REMOTE_DOWNLOAD_INDICATOR_TYPE_SP
         }
         else {
             self.badgeImageView.image = nil;
+        }
+        
+        if (imageStrokeColor) {
+            self.imageView.layer.borderWidth = 0.0f;
+            self.imageView.layer.borderColor = [UIColor clearColor].CGColor;
         }
     }
 }
@@ -462,33 +476,33 @@ static NSString *remoteDownloadIndicatorType = REMOTE_DOWNLOAD_INDICATOR_TYPE_SP
 }
 
 
--(void)handleGesture:(UIGestureRecognizer*)gesture {
-    if (gesture.state == UIGestureRecognizerStateBegan)
-    {
-        [UIView animateWithDuration:0.1 animations:^{
-            self.transform = CGAffineTransformMakeScale(0.9, 0.9);
-            
-        } completion:^(BOOL finished) {
-            
-        }];
-    }
-    else if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled)
-    {
-        [UIView animateWithDuration:0.1 animations:^{
-            self.transform = CGAffineTransformIdentity;
-            
-        } completion:^(BOOL finished) {
-            
-        }];
-    }
-}
-
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer{
-    return YES;
-}
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    return YES;
-}
+//-(void)handleGesture:(UIGestureRecognizer*)gesture {
+//    if (gesture.state == UIGestureRecognizerStateBegan)
+//    {
+//        [UIView animateWithDuration:0.1 animations:^{
+//            self.transform = CGAffineTransformMakeScale(0.9, 0.9);
+//
+//        } completion:^(BOOL finished) {
+//
+//        }];
+//    }
+//    else if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled)
+//    {
+//        [UIView animateWithDuration:0.1 animations:^{
+//            self.transform = CGAffineTransformIdentity;
+//
+//        } completion:^(BOOL finished) {
+//
+//        }];
+//    }
+//}
+//
+//- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer{
+//    return YES;
+//}
+//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+//    return YES;
+//}
 
 
 @end

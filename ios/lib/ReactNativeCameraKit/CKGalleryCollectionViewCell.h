@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 #define SUPPORTED_FILE_TYPES                            @"supportedFileTypes"
+#define UNSUPPORTED_RESOLUTION                          @"unsupportedResultion"
 #define UNSUPPORTED_OVERLAY_COLOR                       @"unsupportedOverlayColor"
 #define UNSUPPORTED_IMAGE                               @"unsupportedImage"
 #define UNSUPPORTED_TEXT                                @"unsupportedText"

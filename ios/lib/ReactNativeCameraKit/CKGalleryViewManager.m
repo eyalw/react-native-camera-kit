@@ -288,9 +288,27 @@ static NSString * const CustomCellReuseIdentifier = @"CustomCell";
         return;
     }
     
-    PHFetchResult *collections = [PHCollectionList fetchTopLevelUserCollectionsWithOptions:nil];
+    // SEARCH SMART ALBUMS (like "Favorites")
     
-    [collections enumerateObjectsUsingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
+    PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                                                                          subtype:PHAssetCollectionSubtypeAlbumRegular
+                                                                          options:nil];
+    
+    [smartAlbums enumerateObjectsUsingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        if ([collection.localizedTitle isEqualToString:albumName]) {
+
+            PHFetchResult *collectionFetchResults = [PHAsset fetchAssetsInAssetCollection:collection options:nil];
+            [self upadateCollectionView:collectionFetchResults animated:(self.galleryData != nil)];
+            *stop = YES;
+            return;
+        }
+    }];
+    
+    // SEARCH USER ALBUMS
+    PHFetchResult *userAlbums = [PHCollectionList fetchTopLevelUserCollectionsWithOptions:nil];
+    
+    [userAlbums enumerateObjectsUsingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
         
         if ([collection.localizedTitle isEqualToString:albumName]) {
             
@@ -346,6 +364,12 @@ static NSString * const CustomCellReuseIdentifier = @"CustomCell";
     
     if (self.supportedFileTypesArray) {
         cell.isSupported = [self.supportedFileTypesArray containsObject:[MIMETypeString lowercaseString]];
+    }
+    
+    NSUInteger minimumResolution = [self.fileTypeSupport[UNSUPPORTED_RESOLUTION] integerValue];
+    if (minimumResolution &&
+        (asset.pixelWidth < minimumResolution || asset.pixelHeight < minimumResolution)) {
+        cell.isSupported = false;
     }
     
     cell.representedAssetIdentifier = asset.localIdentifier;
