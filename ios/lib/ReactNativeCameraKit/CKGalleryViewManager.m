@@ -176,20 +176,22 @@ static NSString * const CustomCellReuseIdentifier = @"CustomCell";
 -(void)upadateCollectionView:(PHFetchResult*)fetchResults animated:(BOOL)animated {
     
     self.galleryData = [[GalleryData alloc] initWithFetchResults:fetchResults selectedImagesIds:self.selectedImages];
-    
-    if (animated) {
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^ {
-            [self.collectionView performBatchUpdates:^{
-                [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:0]];
-            } completion:nil];
-        });
-    }
-    else {
-        dispatch_async(dispatch_get_main_queue(), ^ {
-            [self.collectionView reloadData];
-        });
-    }
+
+//    if (animated) {
+//
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^ {
+//            [self.collectionView performBatchUpdates:^{
+//                [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:0]];
+//            } completion:nil];
+//        });
+//    }
+//    else {
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        [self.collectionView reloadData];
+        // scroll to top
+        [self.collectionView setContentOffset:CGPointZero animated:NO];
+    });
+//    }
 }
 
 
