@@ -36,7 +36,12 @@
     
     for (PHAsset *asset in fetchResults) {
         BOOL isSelected = ([selectedImagesIds containsObject:asset.localIdentifier]) ? YES : NO;
-        
+
+        if (asset.mediaType != PHAssetMediaTypeImage) {
+            // ignore non-image assets (e.g. Video, Audio, etc)
+            continue;
+        }
+
         NSMutableDictionary *assetDictionary = [@{@"asset": asset, @"isSelected": @(isSelected)} mutableCopy];
         
         [array addObject:assetDictionary];
