@@ -185,7 +185,18 @@ RCT_EXPORT_METHOD(getAlbumsWithThumbnails:(RCTPromiseResolveBlock)resolve
                       [albumsArrayAns addObjectsFromArray:userAlbums[@"albums"]];
                   }
                   if(smartAlbums[@"albums"]) {
-                      [albumsArrayAns addObjectsFromArray:smartAlbums[@"albums"]];
+
+                      // only keep the interesting albums in the list (it contains a lot of shit)
+                      NSArray *interestingAlbumNames = @[@"Favorites", @"Selfies"];
+                      NSPredicate *predicate =
+                          [NSPredicate predicateWithBlock:^BOOL(id album, NSDictionary *bindings) {
+                              return [interestingAlbumNames containsObject: album[@"albumName"]];
+                      }];
+                                                
+                      NSArray *interestingAlbums =
+                          [smartAlbums[@"albums"] filteredArrayUsingPredicate:predicate];
+
+                      [albumsArrayAns addObjectsFromArray:interestingAlbums];
                   }
                   if(allPhotosAlbum) {
                       [albumsArrayAns insertObject:allPhotosAlbum atIndex:0];
