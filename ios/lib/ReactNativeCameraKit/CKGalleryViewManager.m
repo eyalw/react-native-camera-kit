@@ -541,10 +541,11 @@ static NSString * const CustomCellReuseIdentifier = @"CustomCell";
         [self downloadImageFromICloudIfNeeded:asset cell:ckCell completion:^(BOOL success) {
             
             if (success) {
-                if (!ckCell.isSupported) {
-                    return;
-                }
-                
+                // allow selection of unsupported resolution
+//                if (!ckCell.isSupported) {
+//                    return;
+//                }
+
                 ckCell.isSelected = !ckCell.isSelected;
                 
                 [self onSelectChanged:asset isSelected:ckCell.isSelected];

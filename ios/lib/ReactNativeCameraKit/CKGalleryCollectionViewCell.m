@@ -335,19 +335,22 @@ static NSString *remoteDownloadIndicatorType = REMOTE_DOWNLOAD_INDICATOR_TYPE_SP
                 
                 [self.unsupportedView addSubview:unsupportedLabel];
             }
-            
-            [self addSubview:self.unsupportedView];
-            [self.badgeImageView removeFromSuperview];
-            self.gesture.enabled = NO;
+
+            //[self addSubview:self.unsupportedView];
+            [self.imageView insertSubview:self.unsupportedView
+                             belowSubview:self.imageOveray];
+
+//            [self.badgeImageView removeFromSuperview];
+//            self.gesture.enabled = NO;
         }
     }
     
     else {
         [self.unsupportedView removeFromSuperview];
         self.unsupportedView = nil;
-        [self addSubview:self.badgeImageView];
-        self.gesture.enabled = YES;
-        
+//        [self addSubview:self.badgeImageView];
+//        self.gesture.enabled = YES;
+
     }
 }
 
@@ -397,8 +400,8 @@ static NSString *remoteDownloadIndicatorType = REMOTE_DOWNLOAD_INDICATOR_TYPE_SP
         }
         
         if (imageStrokeColor) {
-            self.imageView.layer.borderWidth = 4.0f;
-            self.imageView.layer.borderColor = imageStrokeColor.CGColor;
+            self.imageOveray.layer.borderWidth = 4.0f;
+            self.imageOveray.layer.borderColor = imageStrokeColor.CGColor;
         }
     }
     else {
@@ -411,8 +414,8 @@ static NSString *remoteDownloadIndicatorType = REMOTE_DOWNLOAD_INDICATOR_TYPE_SP
         }
         
         if (imageStrokeColor) {
-            self.imageView.layer.borderWidth = 0.0f;
-            self.imageView.layer.borderColor = [UIColor clearColor].CGColor;
+            self.imageOveray.layer.borderWidth = 0.0f;
+            self.imageOveray.layer.borderColor = [UIColor clearColor].CGColor;
         }
     }
 }
